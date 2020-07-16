@@ -24,8 +24,6 @@ De la salida podemos ver que mix ha creado nuestro directorio y un número de ar
 * creating .gitignore
 * creating .formatter.exs
 * creating mix.exs
-* creating config
-* creating config/config.exs
 * creating lib
 * creating lib/example.ex
 * creating test
@@ -70,6 +68,7 @@ La sección `application` es usada durante la generación de nuestro archivo de 
 Puede ser necesario usar `iex` dentro del contexto de nuestra aplicación. Por suerte para nosotros, mix hace esto fácil. Podemos empezar una nueva sesión `iex`:
 
 ```bash
+$ cd example
 $ iex -S mix
 ```
 

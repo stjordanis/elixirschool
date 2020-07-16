@@ -1,5 +1,5 @@
 ---
-version: 2.1.1
+version: 2.4.0
 title: Basics
 ---
 
@@ -37,8 +37,8 @@ Add the ecto and postgrex package dependencies to your `mix.exs` file.
 ```elixir
   defp deps do
     [
-      {:ecto, "~> 2.0"},
-      {:postgrex, "~> 0.11"}
+      {:ecto_sql, "~> 3.2"},
+      {:postgrex, "~> 0.15"}
     ]
   end
 ```
@@ -57,15 +57,14 @@ All communication to the database will be done using this repository.
 Set up a repository by running:
 
 ```shell
-$ mix ecto.gen.repo -r Example.Repo
+$ mix ecto.gen.repo -r Friends.Repo
 ```
 
 This will generate the configuration required in `config/config.exs` to connect to a database including the adapter to use.
-This is the configuration file for our `Example` application
+This is the configuration file for our `Friends` application
 
 ```elixir
-config :friends, Example.Repo,
-  adapter: Ecto.Adapters.Postgres,
+config :friends, Friends.Repo,
   database: "friends_repo",
   username: "postgres",
   password: "",
@@ -73,26 +72,27 @@ config :friends, Example.Repo,
 ```
 
 This configures how Ecto will connect to the database.
-Note how we chose the `Ecto.Adapters.Postgres` adapter.
 
-It also creates a `Example.Repo` module inside `lib/friends/repo.ex`
+It also creates a `Friends.Repo` module inside `lib/friends/repo.ex`
 
 ```elixir
-defmodule Example.Repo do
-  use Ecto.Repo, otp_app: :friends
+defmodule Friends.Repo do
+  use Ecto.Repo, 
+    otp_app: :friends,
+    adapter: Ecto.Adapters.Postgres
 end
 ```
 
-We'll use the `Example.Repo` module to query the database. We also tell this module to find its database configuration information in the `:friends` Elixir application.
+We'll use the `Friends.Repo` module to query the database. We also tell this module to find its database configuration information in the `:friends` Elixir application and we chose the `Ecto.Adapters.Postgres` adapter.
 
-Next, we'll setup the `Example.Repo` as a supervisor within our application's supervision tree in `lib/friends/application.ex`.
+Next, we'll setup the `Friends.Repo` as a supervisor within our application's supervision tree in `lib/friends/application.ex`.
 This will start the Ecto process when our application starts.
 
 ```elixir
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [
-      Example.Repo,
+      Friends.Repo,
     ]
 
   ...
@@ -101,7 +101,7 @@ This will start the Ecto process when our application starts.
 After that we'll need to add the following line to our `config/config.exs` file:
 
 ```elixir
-config :friends, ecto_repos: [Example.Repo]
+config :friends, ecto_repos: [Friends.Repo]
 ```
 
 This will allow our application to run ecto mix commands from the commandline.
@@ -135,7 +135,7 @@ This will generate a new file in the `priv/repo/migrations` folder containing ti
 If we navigate to our directory and open the migration we should see something like this:
 
 ```elixir
-defmodule Example.Repo.Migrations.CreatePeople do
+defmodule Friends.Repo.Migrations.CreatePeople do
   use Ecto.Migration
 
   def change do
@@ -147,7 +147,7 @@ end
 Let's start by modifying the `change/0` function to create a new table `people` with `name` and `age`:
 
 ```elixir
-defmodule Example.Repo.Migrations.CreatePeople do
+defmodule Friends.Repo.Migrations.CreatePeople do
   use Ecto.Migration
 
   def change do
@@ -173,12 +173,12 @@ $ mix ecto.migrate
 Now that we've created our initial table we need to tell Ecto more about it, part of how we do that is through schemas.
 A schema is a module that defines mappings to the underlying database table's fields.
 
-While Ecto favors pluralize database table names, the schema is typically singular, so we'll create a `Person` schema to accomplany our table.
+While Ecto favors pluralize database table names, the schema is typically singular, so we'll create a `Person` schema to accompany our table.
 
 Let's create our new schema at `lib/friends/person.ex`:
 
 ```elixir
-defmodule Example.Person do
+defmodule Friends.Person do
   use Ecto.Schema
 
   schema "people" do
@@ -188,21 +188,21 @@ defmodule Example.Person do
 end
 ```
 
-Here we can see that the `Example.Person` module tells Ecto that this schema relates to the `people` table and that we have two columns: `name` which is a string and `age`, an integer with a default of `0`.
+Here we can see that the `Friends.Person` module tells Ecto that this schema relates to the `people` table and that we have two columns: `name` which is a string and `age`, an integer with a default of `0`.
 
 Let's take a peek at our schema by opening `iex -S mix` and creating a new person:
 
-```shell
-iex> %Example.Person{}
-%Example.Person{age: 0, name: nil}
+```elixir
+iex> %Friends.Person{}
+%Friends.Person{age: 0, name: nil}
 ```
 
 As expected we get a new `Person` with the default value applied to `age`.
 Now let's create a "real" person:
 
-```shell
-iex> person = %Example.Person{name: "Tom", age: 11}
-%Example.Person{age: 11, name: "Tom"}
+```elixir
+iex> person = %Friends.Person{name: "Tom", age: 11}
+%Friends.Person{age: 11, name: "Tom"}
 ```
 
 Since schemas are just structs, we can interact with our data like we're used to:
@@ -213,7 +213,7 @@ iex> person.name
 iex> Map.get(person, :name)
 "Tom"
 iex> %{name: name} = person
-%Example.Person{age: 11, name: "Tom"}
+%Friends.Person{age: 11, name: "Tom"}
 iex> name
 "Tom"
 ```
@@ -222,9 +222,9 @@ Similarly, we can update our schemas just as we would any other map or struct in
 
 ```elixir
 iex> %{person | age: 18}
-%Example.Person{age: 18, name: "Tom"}
+%Friends.Person{age: 18, name: "Tom"}
 iex> Map.put(person, :name, "Jerry")
-%Example.Person{age: 11, name: "Jerry"}
+%Friends.Person{age: 18, name: "Jerry"}
 ```
 
 In our next lesson on Changesets, we'll look at how to validate our data changes and finally how to persist them to

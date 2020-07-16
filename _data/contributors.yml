@@ -12,7 +12,7 @@
   intro:
     Sean has been passionately involved with Elixir since the very beginning.
     After experiencing the joys of working with Elixir he created Elixir School and has become a core contributor to numerous libraries.
-    During the day, Sean help companies transition teams and codebases to Elixir.
+    During the day, Sean helps companies transition teams and codebases to Elixir.
   twitter: doomspork
   homepage: https://seancallan.com
   contributions:
@@ -251,12 +251,15 @@
     - "no"
 
 - github: brain-geek
-  name:
+  name: Alex Rozumii
   intro:
   homepage:
   twitter:
   contributions:
+    - lesson
     - translator
+  lessons:
+    - Nerves
   languages:
     - ru
     - uk
@@ -286,6 +289,16 @@
   intro:
   homepage:
   twitter:
+  contributions:
+    - translator
+  languages:
+    - es
+
+- github: j-burgos
+  name: Jorge Burgos
+  intro: Elixir enthusiast from El Salvador
+  homepage:
+  twitter: jburgosk8
   contributions:
     - translator
   languages:
@@ -405,7 +418,7 @@
 - github: maxcell
   name: Prince Wilson
   intro:
-    Prince is an teacher over at the Flatiron School. He enjoys sharing knowledge with people as he learns new things!
+    Prince is a teacher at the Flatiron School. He enjoys sharing knowledge with people as he learns new things!
     Finding ways to create accessible, impactful content to developers out there is his jam.
   twitter: maxcell
   homepage: https://maxcell.me/
@@ -442,3 +455,73 @@
     - translator
   languages:
     - zh-hans
+    
+- github: caicaishmily
+  name: Chai
+  intro:
+  homepage:
+  twitter:
+  contributions:
+    - translator
+  languages:
+    - zh-hans
+
+- github: vbrazo
+  name: Vitor Oliveira
+  intro:
+  homepage: http://github.com/vbrazo
+  twitter:
+  contributions:
+    - translator
+  languages:
+    - pt
+
+- github: filalex77
+  name: Oleksii Filonenko
+  intro:
+  homepage:
+  twitter:
+  contributions:
+    - translator
+  languages:
+    - ru
+
+- github: gavlak
+  name: Adam Gavlák
+  intro:
+  homepage: https://www.gavlak.sk/en
+  twitter: adamgavlak
+  contributions:
+    - translator
+  languages:
+    - sk
+
+- github: herminiotorres
+  name: Herminio Torres
+  intro: I'm a developer at the Fundação Estudar NGO and Elixir enthusiast and living in Brazil.
+  homepage: https://herminiotorres.github.io
+  twitter: herminiotorres
+  contributions:
+    - translator
+  languages:
+    - pt
+
+- github: progsmile
+  name: Denis Klimenko
+  intro:
+  homepage:
+  twitter:
+  contributions:
+    - translator
+  languages:
+    - ru
+
+- github: artkay
+  name: Artem Kay
+  intro:
+  homepage: https://zelda.dog
+  twitter: artk4y
+  contributions:
+    - translator
+  languages:
+    - ru

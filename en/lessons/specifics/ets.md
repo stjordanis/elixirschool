@@ -1,5 +1,5 @@
 ---
-version: 1.1.0
+version: 1.1.1
 title: Erlang Term Storage (ETS)
 ---
 
@@ -15,7 +15,8 @@ ETS is capable of storing large amounts of data and offers constant time data ac
 
 Tables in ETS are created and owned by individual processes.
 When an owner process terminates, its tables are destroyed.
-By default ETS is limited to 1400 tables per node.
+You can have as many ETS table as you want, the only limit is the server memory. A limit can be specified using the `ERL_MAX_ETS_TABLES` environment variable.
+
 
 ## Creating Tables
 
@@ -160,7 +161,7 @@ iex> :ets.match_object(:user_lookup, {:"$1", :"_", :"$3"})
 
 {% raw %}iex> :ets.select(:user_lookup, [{{:"$1", :"_", :"$3"}, [], [:"$_"]}]){% endraw %}
 [{"doomspork", "Sean", ["Elixir", "Ruby", "Java"]},
- {"spork", 30, ["ruby", "elixir"]}]
+ {"3100", "", ["Elixir", "Ruby", "JavaScript"]}]
 ```
 
 Although `select/2` allows for finer control over what and how we retrieve records, the syntax is quite unfriendly and will only become more so.

@@ -1,5 +1,5 @@
 ---
-version: 1.1.0
+version: 1.1.1
 title: Mix
 ---
 
@@ -24,8 +24,6 @@ $ mix new example
 * creating .gitignore
 * creating .formatter.exs
 * creating mix.exs
-* creating config
-* creating config/config.exs
 * creating lib
 * creating lib/example.ex
 * creating test
@@ -70,6 +68,7 @@ end
 有时候需要用 `iex` 和我们的项目交互，幸运的是，mix 支持这个功能。编译了项目之后，我们用下面的命令打开一个新的 `iex` 会话：
 
 ```bash
+$ cd example
 $ iex -S mix
 ```
 

@@ -24,8 +24,6 @@ $ mix new example
 * creating .gitignore
 * creating .formatter.exs
 * creating mix.exs
-* creating config
-* creating config/config.exs
 * creating lib
 * creating lib/example.ex
 * creating test
@@ -70,6 +68,7 @@ end
 Може да се наложи да ползваме `iex` в контекста на нашата апликация.  За щастие това е лесно с mix.  Можем да почнем нова `iex` сесия:
 
 ```bash
+$ cd example
 $ iex -S mix
 ```
 

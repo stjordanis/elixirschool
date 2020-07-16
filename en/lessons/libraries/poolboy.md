@@ -1,5 +1,5 @@
 ---
-version: 1.1.2
+version: 1.2.0
 title: Poolboy
 ---
 
@@ -12,7 +12,7 @@ You can easily exhaust your system resources if you do not limit the maximum num
 
 Let's think of a specific example for a moment.
 You are tasked to build an application for saving user profile information to the database.
-If you've created a process for every user registration, you would create unbounded number of connections.
+If you've created a process for every user registration, you would create an unbounded number of connections.
 At some point the number of those connections can exceed the capacity of your database server.
 Eventually your application can get timeouts and various exceptions.
 
@@ -78,10 +78,10 @@ defmodule PoolboyApp.Application do
 
   defp poolboy_config do
     [
-      {:name, {:local, :worker}},
-      {:worker_module, PoolboyApp.Worker},
-      {:size, 5},
-      {:max_overflow, 2}
+      name: {:local, :worker},
+      worker_module: PoolboyApp.Worker,
+      size: 5,
+      max_overflow: 2
     ]
   end
 
@@ -115,7 +115,7 @@ defmodule PoolboyApp.Worker do
   use GenServer
 
   def start_link(_) do
-    GenServer.start_link(__MODULE__, nil, [])
+    GenServer.start_link(__MODULE__, nil)
   end
 
   def init(_) do
@@ -124,7 +124,7 @@ defmodule PoolboyApp.Worker do
 
   def handle_call({:square_root, x}, _from, state) do
     IO.puts("process #{inspect(self())} calculating square root of #{x}")
-    :timer.sleep(1000)
+    Process.sleep(1000)
     {:reply, :math.sqrt(x), state}
   end
 end

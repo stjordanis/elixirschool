@@ -1,5 +1,5 @@
 ---
-version: 1.0.2
+version: 1.1.1
 title: GenStage
 ---
 
@@ -67,7 +67,7 @@ Let's update our dependencies in `mix.exs` to include `gen_stage`:
 ```elixir
 defp deps do
   [
-    {:gen_stage, "~> 0.11"},
+    {:gen_stage, "~> 1.0.0"},
   ]
 end
 ```
@@ -87,7 +87,6 @@ As we discussed before, we want to create a producer that emits a constant strea
 Let's create our producer file:
 
 ```shell
-$ mkdir lib/genstage_example
 $ touch lib/genstage_example/producer.ex
 ```
 
@@ -136,7 +135,7 @@ defmodule GenstageExample.ProducerConsumer do
 
   require Integer
 
-  def start_link do
+  def start_link(_initial) do
     GenStage.start_link(__MODULE__, :state_doesnt_matter, name: __MODULE__)
   end
 
@@ -177,7 +176,7 @@ Since consumers and producer-consumers are so similar our code won't look much d
 defmodule GenstageExample.Consumer do
   use GenStage
 
-  def start_link do
+  def start_link(_initial) do
     GenStage.start_link(__MODULE__, :state_doesnt_matter)
   end
 
@@ -209,9 +208,9 @@ def start(_type, _args) do
   import Supervisor.Spec, warn: false
 
   children = [
-    worker(GenstageExample.Producer, [0]),
-    worker(GenstageExample.ProducerConsumer, []),
-    worker(GenstageExample.Consumer, [])
+    {GenstageExample.Producer, 0},
+    {GenstageExample.ProducerConsumer, []},
+    {GenstageExample.Consumer, []}
   ]
 
   opts = [strategy: :one_for_one, name: GenstageExample.Supervisor]
@@ -223,6 +222,7 @@ If things are all correct, we can run our project and we should see everything w
 
 ```shell
 $ mix run --no-halt
+{#PID<0.109.0>, 0, :state_doesnt_matter}
 {#PID<0.109.0>, 2, :state_doesnt_matter}
 {#PID<0.109.0>, 4, :state_doesnt_matter}
 {#PID<0.109.0>, 6, :state_doesnt_matter}
@@ -247,10 +247,16 @@ Let's make some adjustments for multiple workers by modifying `lib/genstage_exam
 
 ```elixir
 children = [
-  worker(GenstageExample.Producer, [0]),
-  worker(GenstageExample.ProducerConsumer, []),
-  worker(GenstageExample.Consumer, [], id: 1),
-  worker(GenstageExample.Consumer, [], id: 2)
+  {GenstageExample.Producer, 0},
+  {GenstageExample.ProducerConsumer, []},
+  %{
+    id: 1,
+    start: {GenstageExample.Consumer, :start_link, [[]]}
+  },
+  %{
+    id: 2,
+    start: {GenstageExample.Consumer, :start_link, [[]]}
+  },
 ]
 ```
 
@@ -258,10 +264,10 @@ Now that we've configured two consumers, let's see what we get if we run our app
 
 ```shell
 $ mix run --no-halt
+{#PID<0.120.0>, 0, :state_doesnt_matter}
 {#PID<0.120.0>, 2, :state_doesnt_matter}
-{#PID<0.121.0>, 4, :state_doesnt_matter}
+{#PID<0.120.0>, 4, :state_doesnt_matter}
 {#PID<0.120.0>, 6, :state_doesnt_matter}
-{#PID<0.120.0>, 8, :state_doesnt_matter}
 ...
 {#PID<0.120.0>, 86478, :state_doesnt_matter}
 {#PID<0.121.0>, 87338, :state_doesnt_matter}
@@ -279,7 +285,7 @@ Now that we've covered GenStage and built our first example application, what ar
 We could produce events from a database or even another source like Apache's Kafka.
 With a combination of producer-consumers and consumers, we could process, sort, catalog, and store metrics as they become available.
 
-+ Work Queue — Since events can be anything, we could produce works of unit to be completed by a series of consumers.
++ Work Queue — Since events can be anything, we could produce units of work to be completed by a series of consumers.
 
 + Event Processing — Similar to a data pipeline, we could receive, process, sort, and take action on events emitted in real time from our sources.
 

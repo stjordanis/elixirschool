@@ -1,5 +1,5 @@
 ---
-version: 1.0.3
+version: 1.1.0
 title: 文档模块
 ---
 
@@ -48,6 +48,8 @@ end
 
 用户可以在IEx里面通过`h`这个辅助函数看到我们在这个模块里定义的文档。
 
+我们可以通过把 `Greeter` 模块移到一个新文件 `greeter.ex` 并编译来亲自试验一下。
+
 ```elixir
 iex> c("greeter.ex")
 [Greeter]
@@ -58,6 +60,8 @@ iex> h Greeter
 
 Provides a function hello/1 to greet a human
 ```
+
+_注意_: 如果代码是在一个 mix 项目底下，我们并不需要像上面那样手动编译文件。只需要通过执行 `iex -S mix` 命令，IEx 控制台就可以加载当前项目。
 
 ### 函数注释
 
@@ -134,8 +138,6 @@ $ mix new greet_everyone
 * creating .formatter.exs
 * creating .gitignore
 * creating mix.exs
-* creating config
-* creating config/config.exs
 * creating lib
 * creating lib/greet_everyone.ex
 * creating test
@@ -181,9 +183,10 @@ Examples
 假设一切都正常工作，那么你将看到和上面一样的输出，现在我们将配置ExDoc。在文件`mix.exs`中，添加两个依赖`:earmark` 和 `:ex_doc`。
 
 ```elixir
-def deps do
-  [{:earmark, "~> 0.1", only: :dev}, {:ex_doc, "~> 0.11", only: :dev}]
-end
+  def deps do
+    [{:earmark, "~> 1.2", only: :dev},
+    {:ex_doc, "~> 0.19", only: :dev}]
+  end
 ```
 
 使用`only: :dev`是因为我们不想在生产环境下下载和编译这些依赖。为什么需要Earmark呢？Earmark是一个使用Elixir编写的markdown分析器，ExDoc使用它来将带有`@moduledoc` 和 `@doc`的注释转换成漂亮的HTML页面。

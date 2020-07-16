@@ -1,5 +1,5 @@
 ---
-version: 1.0.0
+version: 1.1.0
 title: 日付と時間
 ---
 
@@ -10,8 +10,6 @@ Elixirで時間を扱ってみましょう。
 ## Time
 
 Elixirは時間を扱うためのいくつかのモジュールを持っています。
-ただし、この機能はUTCタイムゾーンとの連携に限定されている点に気をつける必要があります。
-
 現在時刻の取得から始めてみましょう:
 
 ```elixir
@@ -19,7 +17,7 @@ iex> Time.utc_now
 ~T[19:39:31.056226]
 ```
 
-`Time`構造体を作るためにシギルも使えます:
+`Time` 構造体を作るためにシギルも使えます:
 
 ```elixir
 iex> ~T[19:39:31.056226]
@@ -44,14 +42,14 @@ iex> t.day
 
 ## Date
 
-`Time`に対して、`Date`構造体は現在の日付に関する情報を持ち、現在の時間に関する情報は含みません。
+`Time` に対して、 `Date` 構造体は現在の日付に関する情報を持ち、現在の時間に関する情報は含みません。
 
 ```elixir
 iex> Date.utc_today
 ~D[2028-10-21]
 ```
 
-しかし、これは日にちと連携する便利な関数をいくつか持っています:
+それから、これは日にちと連携する便利な関数をいくつか持っています:
 
 ```elixir
 iex> {:ok, date} = Date.new(2020, 12,12)
@@ -62,15 +60,15 @@ iex> Date.leap_year? date
 true
 ```
 
-`day_of_week/1`は与えられた日付がどの曜日にあたるのかを計算します。
+`day_of_week/1` は与えられた日付がどの曜日にあたるのかを計算します。
 この場合は土曜日です。
-`leap_year?/1`は閏年かどうかをチェックします。
+`leap_year?/1` は閏年かどうかをチェックします。
 その他の関数は [doc](https://hexdocs.pm/elixir/Date.html) で探すことができます。
 
 ## NaiveDateTime
 
 Elixirには日付と時間を同時に含む構造体が2種類あります。
-そのうち1つは`NaiveDateTime`です。
+最初に紹介するのは `NaiveDateTime` です。
 この構造体のデメリットはタイムゾーンのサポートが無いという点です:
 
 ```elixir
@@ -87,14 +85,11 @@ iex> NaiveDateTime.add(~N[2018-10-01 00:00:14], 30)
 
 ## DateTime
 
-2つ目は、このセクションのタイトルから想像がつくように、`DateTime`です。
-この構造体には前述したような制限はありません。そのため、これは時間と日付を両方持ち、タイムゾーンもサポートしています。
-しかし公式ドキュメントにあるように、タイムゾーンについては注意してください:
+2つ目は、このセクションのタイトルから想像がつくように、 `DateTime` です。
+`NaiveDateTime` で記載したような制限はありません。そのため、これは時間と日付を両方持ち、タイムゾーンもサポートしています。
+しかしタイムゾーンについては注意してください。公式ドキュメントではこのように記載されています:
 
-```
-このモジュールには変換関数とUTCで動作する関数だけが含まれていることに気付くでしょう。
-これは、適切なDateTimeの実装には、現時点でElixirの機能として提供されていないタイムゾーンデータベースを必要とするためです。
-```
+> このモジュールの多くの機能には、タイムゾーンデータベースが必要です。デフォルトでは `Calendar.get_time_zone_database/0` によって返されるデフォルトのタイムゾーンデータベースを使います。デフォルトでは `Calendar.UTCOnlyTimeZoneDatabase` で、 "Etc/UTC"のみを処理し、他のタイムゾーンでは `{:error, :utc_only_time_zone_database}` を返します。
 
 また、タイムゾーンを提供するだけで、NaiveDateTimeからDateTimeのインスタンスを作ることができます:
 
@@ -103,5 +98,27 @@ iex> DateTime.from_naive(~N[2016-05-24 13:26:08.003], "Etc/UTC")
 {:ok, #DateTime<2016-05-24 13:26:08.003Z>}
 ```
 
-これがそうです！さらに高度な他の機能を使いたい場合は、 [Time](https://hexdocs.pm/elixir/Time.html) 、 [Date](https://hexdocs.pm/elixir/Date.html) 、 [DateTime](https://hexdocs.pm/elixir/DateTime.html) のドキュメントをさらに確認することを考慮するといいでしょう。
+## タイムゾーンの利用
+前の章で述べたように、Elixir本体にはタイムゾーンデータがありません。
+この問題を解決するには、[tzdata](https://github.com/lau/tzdata) パッケージをインストールして設定する必要があります。
+それをインストールした後、Tzdataをタイムゾーンデータベースとして使用するように、Elixirにグローバル設定をする必要があります。
+
+```
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+```
+
+パリのタイムゾーンで時間を作成して、それをニューヨーク時間に変換してみましょう。
+
+```
+iex> paris_datetime = DateTime.from_naive!(~N[2019-01-01 12:00:00], "Europe/Paris")
+#DateTime<2019-01-01 12:00:00+01:00 CET Europe/Paris>
+iex> {:ok, ny_datetime} = DateTime.shift_zone(paris_datetime, "America/New_York")
+{:ok, #DateTime<2019-01-01 06:00:00-05:00 EST America/New_York>}
+iex> ny_datetime
+#DateTime<2019-01-01 06:00:00-05:00 EST America/New_York>
+```
+
+ご覧のとおり、時刻はパリの12:00から6:00に変更されました。これは正しいです。2つの都市の時差は6時間です。
+
+これがそうです！さらに高度な他の機能を使いたい場合は、 [Time](https://hexdocs.pm/elixir/Time.html) 、 [Date](https://hexdocs.pm/elixir/Date.html) 、 [DateTime](https://hexdocs.pm/elixir/DateTime.html)、 [NaiveDateTime](https://hexdocs.pm/elixir/NaiveDateTime.html) のドキュメントをさらに確認することを考慮するといいでしょう。
 Elixirで時間を扱うパワフルなライブラリである [Timex](https://github.com/bitwalker/timex) と [Calendar](https://github.com/lau/calendar) についても考慮するべきです。

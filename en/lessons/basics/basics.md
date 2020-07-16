@@ -103,9 +103,9 @@ false
 The booleans `true` and `false` are also the atoms `:true` and `:false`, respectively.
 
 ```elixir
-iex> true |> is_atom
+iex> is_atom(true)
 true
-iex> :true |> is_boolean
+iex> is_boolean(:true)
 true
 iex> :true === true
 true
@@ -245,7 +245,7 @@ An important feature of Elixir is that any two types can be compared; this is pa
 number < atom < reference < function < port < pid < tuple < map < list < bitstring
 ```
 
-This can lead to some interesting, yet valid, comparisons you may not find in other languages:
+This can lead to some interesting, yet valid comparisons you may not find in other languages:
 
 ```elixir
 iex> :hello > 999

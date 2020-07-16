@@ -1,5 +1,5 @@
 ---
-version: 1.1.1
+version: 1.2.0
 title: Testing
 ---
 
@@ -37,8 +37,7 @@ Finished in 0.03 seconds
 2 tests, 0 failures
 ```
 
-Why there are two tests in output? Let's look at `lib/example.ex`.
-Mix created there another test for us, some doctest.
+Why are there two dots in the test output? Besides the test in `test/example_test.exs`, Mix also generated a doctest in `lib/example.ex`.
 
 ```elixir
 defmodule Example do
@@ -113,7 +112,7 @@ We'll see an example of `assert_raise` in the next lesson on Plug.
 
 ### assert_receive
 
-In Elixir, applications consist of actors/processes that send messages to each other, thus often you want to test the messages being sent.
+In Elixir, applications consist of actors/processes that send messages to each other, therefore you will want to test the messages being sent.
 Since ExUnit runs in its own process it can receive messages just like any other process and you can assert on it with the `assert_received` macro:
 
 ```elixir
@@ -177,14 +176,20 @@ defmodule ExampleTest do
 end
 ```
 
-## Mocking
+## Test Mocks
 
-The simple answer to mocking in Elixir is: don't.
-You may instinctively reach for mocks but they are highly discouraged in the Elixir community and for good reason.
+We want to be careful of how we think about “mocking”. When we mock certain interactions by creating unique function stubs in a given test example, we establish a dangerous pattern. We couple the run of our tests to the behavior of a particular dependency, like an API client. We avoid defining shared behavior among our stubbed functions. We make it harder to iterate on our tests.
 
-For a longer discussion there is this [excellent article](http://blog.plataformatec.com.br/2015/10/mocks-and-explicit-contracts/).
-The gist is, that instead of mocking away dependencies for testing (mock as a *verb*), it has many advantages to explicitly define interfaces (behaviors) for code outside your application and using Mock (as a *noun*) implementations in your client code for testing.
+Instead, the Elixir community encourages us to change the way we think about test mocks; that we think about a mock as a noun, instead of a verb.
 
-To switch the implementations in your application code, the preferred way is to pass the module as arguments and use a default value.
-If that does not work, use the built-in configuration mechanism.
-For creating these mock implementations, you don't need a special mocking library, only behaviours and callbacks.
+For a longer discussion on this topic, see this [excellent article](http://blog.plataformatec.com.br/2015/10/mocks-and-explicit-contracts/).
+
+The gist is, that instead of mocking away dependencies for testing (mock as a *verb*), it has many advantages to explicitly define interfaces (behaviors) for code outside your application and use mock (as a *noun*) implementations in your code for testing.
+
+To leverage this "mocks-as-a-noun" pattern you can:
+
+* Define a behaviour that is implemented both by the entity for which you'd like to define a mock _and_ the module that will act as the mock.
+* Define the mock module
+* Configure your application code to use the mock in the given test or test environment, for example by passing the mock module into a function call as an argument or by configuring your application to use the mock module in the test environment.
+
+For a deeper dive into test mocks in Elixir, and a look at the Mox library that allows you to define concurrent mock, check out our lesson on Mox [here](../libraries/mox)

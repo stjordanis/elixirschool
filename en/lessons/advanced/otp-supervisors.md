@@ -18,7 +18,7 @@ Using the `SimpleQueue` from the [OTP Concurrency](../../advanced/otp-concurrenc
 Create a new project using `mix new simple_queue --sup` to create a new project with a supervisor tree.
 The code for the `SimpleQueue` module should go in `lib/simple_queue.ex` and the supervisor code we'll be adding will go in `lib/simple_queue/application.ex`
 
-Children are defined using a list, either a list module names:
+Children are defined using a list, either a list of module names:
 
 ```elixir
 defmodule SimpleQueue.Application do
@@ -81,9 +81,9 @@ The `use GenServer`, `use Supervisor`, and `use Agent` macros automatically defi
 def child_spec(opts) do
   %{
     id: SimpleQueue,
-    start: {__MODULE__, :start_link, [opts]}
-    shutdown: 5_000
-    restart: :permanent
+    start: {__MODULE__, :start_link, [opts]},
+    shutdown: 5_000,
+    restart: :permanent,
     type: :worker
   }
 end

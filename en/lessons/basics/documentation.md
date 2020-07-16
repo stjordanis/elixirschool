@@ -1,5 +1,5 @@
 ---
-version: 1.0.3
+version: 1.1.0
 title: Documentation
 ---
 
@@ -41,7 +41,7 @@ It is best used in moderation.
 
 The `@moduledoc` annotator allows for inline documentation at a module level.
 It typically sits just under the `defmodule` declaration at the top of a file.
-The below example shows a one line comment within the `@moduledoc` decorator.
+The example below shows a one line comment within the `@moduledoc` decorator.
 
 ```elixir
 defmodule Greeter do
@@ -56,6 +56,7 @@ end
 ```
 
 We (or others) can access this module documentation using the `h` helper function within IEx.
+We can see this for ourselves if we put our `Greeter` module into a new file, `greeter.ex` and compile it:
 
 ```elixir
 iex> c("greeter.ex")
@@ -67,6 +68,8 @@ iex> h Greeter
 
 Provides a function hello/1 to greet a human
 ```
+
+_Note_: we don't need to manually compile our files as we did above if we're working within the context of a mix project. You can use `iex -S mix` to load the IEx console for the current project if you're working in a mix project.
 
 ### Documenting Functions
 
@@ -148,8 +151,6 @@ $ mix new greet_everyone
 * creating .formatter.exs
 * creating .gitignore
 * creating mix.exs
-* creating config
-* creating config/config.exs
 * creating lib
 * creating lib/greet_everyone.ex
 * creating test
@@ -171,7 +172,7 @@ $ cd greet_everyone
 Now copy and paste the code from the `@doc` annotator lesson into a file called `lib/greeter.ex` and make sure everything is still working from the command line.
 Now that we are working within a Mix project we need to start IEx a little differently using the `iex -S mix` command sequence:
 
-```bash
+```elixir
 iex> h Greeter.hello
 
                 def hello(name)
@@ -194,20 +195,21 @@ Examples
 ### Installing
 
 Assuming all is well and we're seeing the output above, we are now ready to set up ExDoc.
-In the `mix.exs` file, add the two required dependencies to get started: `:earmark` and `:ex_doc`.
+In the `mix.exs` file, add the `:ex_doc` dependency to get started.
 
 ```elixir
   def deps do
-    [{:earmark, "~> 1.2", only: :dev},
-    {:ex_doc, "~> 0.19", only: :dev}]
+    [{:ex_doc, "~> 0.21", only: :dev, runtime: false}]
   end
 ```
 
-We specify the `only: :dev` key-value pair as we don't want to download and compile these dependencies in a production environment.
-But why Earmark? Earmark is a Markdown parser for the Elixir programming language that ExDoc utilizes to turn our documentation within `@moduledoc` and `@doc` to beautiful looking HTML.
+We specify the `only: :dev` key-value pair as we don't want to download and compile the `ex_doc` dependency in a production environment.
 
-It is worth noting at this point that you are not forced to use Earmark.
-You can change the markup tool to others such as Pandoc, Hoedown, or Cmark; however you will need to do a little more configuration which you can read about [here](https://github.com/elixir-lang/ex_doc#changing-the-markdown-tool).
+`ex_doc` will also add another library for us, Earmark.
+
+Earmark is a Markdown parser for the Elixir programming language that ExDoc utilizes to turn our documentation within `@moduledoc` and `@doc` to beautiful looking HTML.
+
+It is worth noting at this point that you change the markup tool to Cmark if you wish, but you will need to do a little more configuration which you can read about [here](https://hexdocs.pm/ex_doc/ExDoc.Markdown.html#module-using-cmark).
 For this tutorial, we'll just stick with Earmark.
 
 ### Generating Documentation

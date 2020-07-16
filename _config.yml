@@ -19,7 +19,7 @@ plugins:
   - kramdown
   - uglifier
   - jekyll-archives
-  
+
 # Markdown Config
 markdown: kramdown
 kramdown:
@@ -47,20 +47,20 @@ sitemap:
   priority_name: 'priority'
 
 elixir:
-  version: 1.8
+  version: 1.10.1
 
 erlang:
-  OTP: 21.1
-  erts: 10.1
+  OTP: 22.0
+  erts: 10.5.3
 
 jekyll-archives:
   enabled: ['categories', 'tags', 'year']
   layout: archive
-  permalinks: 
+  permalinks:
     year: '/blog/years/:year/'
     category: '/blog/categories/:name/'
     tag: '/blog/tags/:name/'
-    
+
 defaults:
   -
     scope:

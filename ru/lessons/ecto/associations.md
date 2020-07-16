@@ -1,5 +1,5 @@
 ---
-version: 1.1.0
+version: 1.2.1
 title: Связи
 ---
 
@@ -9,7 +9,7 @@ title: Связи
 
 ## Настройка
 
-Начнём с приложения `Example`, которое уже использовалось в предыдущих уроках. [Здесь](../basics) можно вспомнить, о чём идёт речь.
+Начнём с приложения `Friends`, которое уже использовалось в предыдущих уроках. [Здесь](../basics) можно вспомнить, о чём идёт речь.
 
 ## Типы ассоциаций
 
@@ -21,7 +21,7 @@ title: Связи
 
 #### Миграция Has Many
 
-Сгенерируем миграцию для схемами `Movie`:
+Сгенерируем миграцию для схемы `Movie`:
 
 ```console
 mix ecto.gen.migration create_movies
@@ -31,7 +31,7 @@ mix ecto.gen.migration create_movies
 
 ```elixir
 # priv/repo/migrations/*_create_movies.exs
-defmodule Example.Repo.Migrations.CreateMovies do
+defmodule Friends.Repo.Migrations.CreateMovies do
   use Ecto.Migration
 
   def change do
@@ -49,13 +49,13 @@ end
 
 ```elixir
 # lib/example/movie.ex
-defmodule Example.Movie do
+defmodule Friends.Movie do
   use Ecto.Schema
 
   schema "movies" do
     field :title, :string
     field :tagline, :string
-    has_many :characters, Example.Character
+    has_many :characters, Friends.Character
   end
 end
 ```
@@ -82,7 +82,7 @@ add :movie_id, references(:movies)
 
 ```elixir
 # priv/migrations/*_create_characters.exs
-defmodule Example.Repo.Migrations.CreateCharacters do
+defmodule Friends.Repo.Migrations.CreateCharacters do
   use Ecto.Migration
 
   def change do
@@ -101,12 +101,12 @@ end
 ```elixir
 # lib/example/character.ex
 
-defmodule Example.Character do
+defmodule Friends.Character do
   use Ecto.Schema
 
   schema "characters" do
     field :name, :string
-    belongs_to :movie, Example.Movie
+    belongs_to :movie, Friends.Movie
   end
 end
 ```
@@ -129,12 +129,12 @@ mix ecto.migrate
 mix ecto.gen.migration create_distributors
 ```
 
-Добавим создание поля `movie_id` в таблице `distributors`:
+Добавим создание поля `movie_id` в таблице `distributors` вместе с уникальным индексом, который позволит фильму иметь только одного дистрибьютора:
 
 ```elixir
 # priv/repo/migrations/*_create_distributors.exs
 
-defmodule Example.Repo.Migrations.CreateDistributors do
+defmodule Friends.Repo.Migrations.CreateDistributors do
   use Ecto.Migration
 
   def change do
@@ -142,6 +142,8 @@ defmodule Example.Repo.Migrations.CreateDistributors do
       add :name, :string
       add :movie_id, references(:movies)
     end
+
+    create unique_index(:distributors, [:movie_id])
   end
 end
 ```
@@ -151,12 +153,12 @@ end
 ```elixir
 # lib/example/distributor.ex
 
-defmodule Example.Distributor do
+defmodule Friends.Distributor do
   use Ecto.Schema
 
   schema "distributors" do
     field :name, :string
-    belongs_to :movie, Example.Movie
+    belongs_to :movie, Friends.Movie
   end
 end
 ```
@@ -166,14 +168,14 @@ end
 ```elixir
 # lib/example/movie.ex
 
-defmodule Example.Movie do
+defmodule Friends.Movie do
   use Ecto.Schema
 
   schema "movies" do
     field :title, :string
     field :tagline, :string
-    has_many :characters, Example.Character
-    has_one :distributor, Example.Distributor # I'm new!
+    has_many :characters, Friends.Character
+    has_one :distributor, Friends.Distributor # I'm new!
   end
 end
 ```
@@ -201,7 +203,7 @@ mix ecto.gen.migration create_actors
 ```elixir
 # priv/migrations/*_create_actors.ex
 
-defmodule Example.Repo.Migrations.Actors do
+defmodule Friends.Repo.Migrations.Actors do
   use Ecto.Migration
 
   def change do
@@ -223,7 +225,7 @@ mix ecto.gen.migration create_movies_actors
 ```elixir
 # priv/migrations/*_create_movies_actors.ex
 
-defmodule Example.Repo.Migrations.CreateMoviesActors do
+defmodule Friends.Repo.Migrations.CreateMoviesActors do
   use Ecto.Migration
 
   def change do
@@ -242,15 +244,15 @@ end
 ```elixir
 # lib/example/movie.ex
 
-defmodule Example.Movie do
+defmodule Friends.Movie do
   use Ecto.Schema
 
   schema "movies" do
     field :title, :string
     field :tagline, :string
-    has_many :characters, Example.Character
-    has_one :distributor, Example.Distributor
-    many_to_many :actors, Example.Actor, join_through: "movies_actors" # I'm new!
+    has_many :characters, Friends.Character
+    has_one :distributor, Friends.Distributor
+    many_to_many :actors, Friends.Actor, join_through: "movies_actors" # I'm new!
   end
 end
 ```
@@ -260,12 +262,12 @@ end
 ```elixir
 # lib/example/actor.ex
 
-defmodule Example.Actor do
+defmodule Friends.Actor do
   use Ecto.Schema
 
   schema "actors" do
     field :name, :string
-    many_to_many :movies, Example.Movie, join_through: "movies_actors"
+    many_to_many :movies, Friends.Movie, join_through: "movies_actors"
   end
 end
 ```
@@ -295,14 +297,14 @@ mix ecto.migrate
 Создадим фильм и героя, участвующего в нём. Начнём с записи фильма:
 
 ```elixir
-iex> alias Example.{Movie, Character, Repo}
+iex> alias Friends.{Movie, Character, Repo}
 iex> movie = %Movie{title: "Ready Player One", tagline: "Something about video games"}
 
-%Example.Movie{
-  __meta__: #Ecto.Schema.Metadata<:built, "movies">,
-  actors: #Ecto.Association.NotLoaded<association :actors is not loaded>,
-  characters: #Ecto.Association.NotLoaded<association :characters is not loaded>,
-  distributor: #Ecto.Association.NotLoaded<association :distributor is not loaded>,
+%Friends.Movie{
+  __meta__: %Ecto.Schema.Metadata<:built, "movies">,
+  actors: %Ecto.Association.NotLoaded<association :actors is not loaded>,
+  characters: %Ecto.Association.NotLoaded<association :characters is not loaded>,
+  distributor: %Ecto.Association.NotLoaded<association :distributor is not loaded>,
   id: nil,
   tagline: "Something about video games",
   title: "Ready Player One"
@@ -315,18 +317,18 @@ iex> movie = Repo.insert!(movie)
 
 ```elixir
 character = Ecto.build_assoc(movie, :characters, %{name: "Wade Watts"})
-%Example.Character{
-  __meta__: #Ecto.Schema.Metadata<:built, "characters">,
+%Friends.Character{
+  __meta__: %Ecto.Schema.Metadata<:built, "characters">,
   id: nil,
-  movie: #Ecto.Association.NotLoaded<association :movie is not loaded>,
+  movie: %Ecto.Association.NotLoaded<association :movie is not loaded>,
   movie_id: 1,
   name: "Wade Watts"
 }
 Repo.insert!(character)
-%Example.Character{
-  __meta__: #Ecto.Schema.Metadata<:loaded, "characters">,
+%Friends.Character{
+  __meta__: %Ecto.Schema.Metadata<:loaded, "characters">,
   id: 1,
-  movie: #Ecto.Association.NotLoaded<association :movie is not loaded>,
+  movie: %Ecto.Association.NotLoaded<association :movie is not loaded>,
   movie_id: 1,
   name: "Wade Watts"
 }
@@ -338,18 +340,18 @@ Repo.insert!(character)
 
 ```elixir
 iex> distributor = Ecto.build_assoc(movie, :distributor, %{name: "Netflix"})
-%Example.Distributor{
-  __meta__: #Ecto.Schema.Metadata<:built, "distributors">,
+%Friends.Distributor{
+  __meta__: %Ecto.Schema.Metadata<:built, "distributors">,
   id: nil,
-  movie: #Ecto.Association.NotLoaded<association :movie is not loaded>,
+  movie: %Ecto.Association.NotLoaded<association :movie is not loaded>,
   movie_id: 1,
   name: "Netflix"
 }
 iex> Repo.insert!(distributor)
-%Example.Distributor{
-  __meta__: #Ecto.Schema.Metadata<:loaded, "distributors">,
+%Friends.Distributor{
+  __meta__: %Ecto.Schema.Metadata<:loaded, "distributors">,
   id: 1,
-  movie: #Ecto.Association.NotLoaded<association :movie is not loaded>,
+  movie: %Ecto.Association.NotLoaded<association :movie is not loaded>,
   movie_id: 1,
   name: "Netflix"
 }
@@ -364,19 +366,19 @@ iex> Repo.insert!(distributor)
 Допустим, что фильм уже сохранен в базу данных ранее, и создадим запись для актёра:
 
 ```elixir
-iex> alias Example.Actor
+iex> alias Friends.Actor
 iex> actor = %Actor{name: "Tyler Sheridan"}
-%Example.Actor{
-  __meta__: #Ecto.Schema.Metadata<:built, "actors">,
+%Friends.Actor{
+  __meta__: %Ecto.Schema.Metadata<:built, "actors">,
   id: nil,
-  movies: #Ecto.Association.NotLoaded<association :movies is not loaded>,
+  movies: %Ecto.Association.NotLoaded<association :movies is not loaded>,
   name: "Tyler Sheridan"
 }
 iex> actor = Repo.insert!(actor)
-%Example.Actor{
-  __meta__: #Ecto.Schema.Metadata<:loaded, "actors">,
+%Friends.Actor{
+  __meta__: %Ecto.Schema.Metadata<:loaded, "actors">,
   id: 1,
-  movies: #Ecto.Association.NotLoaded<association :movies is not loaded>,
+  movies: %Ecto.Association.NotLoaded<association :movies is not loaded>,
   name: "Tyler Sheridan"
 }
 ```
@@ -387,8 +389,8 @@ iex> actor = Repo.insert!(actor)
 
 ```elixir
 iex> movie = Repo.preload(movie, [:distributor, :characters, :actors])
-%Example.Movie{
-  __meta__: #Ecto.Schema.Metadata<:loaded, "movies">,
+%Friends.Movie{
+  __meta__: %Ecto.Schema.Metadata<:loaded, "movies">,
   actors: [],
   characters: [],
   distributor: nil,
@@ -402,7 +404,7 @@ iex> movie = Repo.preload(movie, [:distributor, :characters, :actors])
 
 ```elixir
 iex> movie_changeset = Ecto.Changeset.change(movie)
-#Ecto.Changeset<action: nil, changes: %{}, errors: [], data: #Example.Movie<>,
+%Ecto.Changeset<action: nil, changes: %{}, errors: [], data: #Friends.Movie<>,
  valid?: true>
 ```
 
@@ -410,16 +412,16 @@ iex> movie_changeset = Ecto.Changeset.change(movie)
 
 ```elixir
 iex> movie_actors_changeset = movie_changeset |> Ecto.Changeset.put_assoc(:actors, [actor])
-#Ecto.Changeset<
+%Ecto.Changeset<
   action: nil,
   changes: %{
     actors: [
-      #Ecto.Changeset<action: :update, changes: %{}, errors: [],
-       data: #Example.Actor<>, valid?: true>
+      %Ecto.Changeset<action: :update, changes: %{}, errors: [],
+       data: #Friends.Actor<>, valid?: true>
     ]
   },
   errors: [],
-  data: #Example.Movie<>,
+  data: #Friends.Movie<>,
   valid?: true
 >
 ```
@@ -430,13 +432,13 @@ iex> movie_actors_changeset = movie_changeset |> Ecto.Changeset.put_assoc(:actor
 
 ```elixir
 iex> Repo.update!(movie_actors_changeset)
-%Example.Movie{
-  __meta__: #Ecto.Schema.Metadata<:loaded, "movies">,
+%Friends.Movie{
+  __meta__: %Ecto.Schema.Metadata<:loaded, "movies">,
   actors: [
-    %Example.Actor{
-      __meta__: #Ecto.Schema.Metadata<:loaded, "actors">,
+    %Friends.Actor{
+      __meta__: %Ecto.Schema.Metadata<:loaded, "actors">,
       id: 1,
-      movies: #Ecto.Association.NotLoaded<association :movies is not loaded>,
+      movies: %Ecto.Association.NotLoaded<association :movies is not loaded>,
       name: "Bob"
     }
   ],
@@ -454,31 +456,31 @@ iex> Repo.update!(movie_actors_changeset)
 
 ```elixir
 iex> changeset = movie_changeset |> Ecto.Changeset.put_assoc(:actors, [%{name: "Gary"}])
-#Ecto.Changeset<
+%Ecto.Changeset<
   action: nil,
   changes: %{
     actors: [
-      #Ecto.Changeset<
+      %Ecto.Changeset<
         action: :insert,
         changes: %{name: "Gary"},
         errors: [],
-        data: #Example.Actor<>,
+        data: #Friends.Actor<>,
         valid?: true
       >
     ]
   },
   errors: [],
-  data: #Example.Movie<>,
+  data: #Friends.Movie<>,
   valid?: true
 >
 iex>  Repo.update!(changeset)
-%Example.Movie{
-  __meta__: #Ecto.Schema.Metadata<:loaded, "movies">,
+%Friends.Movie{
+  __meta__: %Ecto.Schema.Metadata<:loaded, "movies">,
   actors: [
-    %Example.Actor{
-      __meta__: #Ecto.Schema.Metadata<:loaded, "actors">,
+    %Friends.Actor{
+      __meta__: %Ecto.Schema.Metadata<:loaded, "actors">,
       id: 2,
-      movies: #Ecto.Association.NotLoaded<association :movies is not loaded>,
+      movies: %Ecto.Association.NotLoaded<association :movies is not loaded>,
       name: "Gary"
     }
   ],

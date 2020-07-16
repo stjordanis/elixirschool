@@ -24,8 +24,6 @@ Daripada paparan output kita boleh melihat yang mix telah membuat direktori kita
 * creating .gitignore
 * creating .formatter.exs
 * creating mix.exs
-* creating config
-* creating config/config.exs
 * creating lib
 * creating lib/example.ex
 * creating test
@@ -70,6 +68,7 @@ Bahagian `application` digunakan semasa penjanaan fail aplikasi kita yang akan k
 Ada kemungkinan di mana `iex` perlu digunakan di dalam konteks aplikasi kita.  Kita bernasib baik, mix telah memudahkan kita.  Kita boleh menjalankan satu sesi `iex` baru:
 
 ```bash
+$ cd example
 $ iex -S mix
 ```
 

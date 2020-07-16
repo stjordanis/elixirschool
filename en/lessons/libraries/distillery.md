@@ -1,9 +1,11 @@
 ---
-version: 2.0.1
+version: 2.0.2
 title: Distillery (Basics)
 ---
 
 Distillery is a release manager written in pure Elixir. It allows you to generate releases that can be deployed elsewhere with little to no configuration.
+
+{% include toc.html %}
 
 ## What is a release?
 
@@ -28,7 +30,7 @@ A release will contain the folowing:
 
 To add Distillery to your project, add it as a dependency to your `mix.exs` file. *Note* - if you are working on an umbrella app this should be in the mix.exs in the root of your project
 
-```
+```elixir
 defp deps do
   [{:distillery, "~> 2.0"}]
 end
@@ -100,7 +102,7 @@ First, we need to edit our `config/prod.exs` file.
 
 Change the following line from this:
 
-```
+```elixir
 config :book_app, BookAppWeb.Endpoint,
   load_from_system_env: true,
   url: [host: "example.com", port: 80],
@@ -108,8 +110,8 @@ config :book_app, BookAppWeb.Endpoint,
 ```
 to this:
 
-```
-config :book_app, BookApp.Endpoint,
+```elixir
+config :book_app, BookAppWeb.Endpoint,
   http: [port: {:system, "PORT"}],
   url: [host: "localhost", port: {:system, "PORT"}],
   cache_static_manifest: "priv/static/cache_manifest.json",
@@ -130,7 +132,7 @@ If you executed the above command, you might have noticed that your application 
 MIX_ENV=prod mix ecto.create
 ```
 
-This command will create your database for you. Try re-running the application and it should start up successfully. However, you will notice that your migrations to your database have not run. Usually in development we run those migrations manually by calling `mix.ecto migrate`. For the release, we will have to configure it so that it can run the migrations on its own.
+This command will create your database for you. Try re-running the application and it should start up successfully. However, you will notice that your migrations to your database have not run. Usually in development we run those migrations manually by calling `mix ecto.migrate`. For the release, we will have to configure it so that it can run the migrations on its own.
 
 
 ## Running Migrations in Production
@@ -146,7 +148,7 @@ Distillery provides us with the ability to execute code at different points in a
 
 For our purposes, we're going to be using the `post_start` hook to run our apps migrations in production. Let's first go and create a new release task called `migrate`. A release task is a module function that we can call on from the terminal that contains code that is separate from the inner workings of our application. It is useful for tasks that the application itself will typically not need to run.
 
-```
+```elixir
 defmodule BookAppWeb.ReleaseTasks do
   def migrate do
     {:ok, _} = Application.ensure_all_started(:book_app)
@@ -176,7 +178,7 @@ Finally, in our `rel/config.exs` file we're going to add the hook to our prod co
 
 Let's replace
 
-```
+```elixir
 environment :prod do
   set include_erts: true
   set include_src: false
@@ -187,7 +189,7 @@ end
 
 with
 
-```
+```elixir
 environment :prod do
   set include_erts: true
   set include_src: false
@@ -209,7 +211,7 @@ Commands are similar to release tasks in that they are both method functions but
 
 Now that we can run our migrations, we may want to be able to seed our database with information through running a command. First, add a new method to our release tasks. In `BookAppWeb.ReleaseTasks`, add the following:
 
-```
+```elixir
 def seed do
   seed_path = Application.app_dir(:book_app_web, "priv/repo/seeds.exs")
   Code.eval_file(seed_path)
@@ -230,7 +232,7 @@ release_ctl eval "BookAppWeb.ReleaseTasks.seed/0"
 See more about shell_scripts from Distillery [here](https://hexdocs.pm/distillery/extensibility/shell_scripts.html)
 
 Finally, add the following to your `rel/config.exs` file
-```
+```elixir
 release :book_app do
   ...
   set commands: [

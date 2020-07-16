@@ -24,8 +24,6 @@ W konsoli pojawi się informacja, że mix stworzył niezbędne pliki oraz katalo
 * creating .gitignore
 * creating .formatter.exs
 * creating mix.exs
-* creating config
-* creating config/config.exs
 * creating lib
 * creating lib/example.ex
 * creating test
@@ -70,6 +68,7 @@ Sekcja `application` jest używana w czasie tworzenia pliku aplikacji. Przyjrzym
 Może zajść potrzeba użycia `iex` w kontekście naszej aplikacji.  Na całe szczęście z mixem jest to proste. Wystarczy uruchomić nową sesję `iex` z parametrami:
 
 ```bash
+$ cd example
 $ iex -S mix
 ```
 

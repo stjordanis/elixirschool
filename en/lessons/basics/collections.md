@@ -1,5 +1,5 @@
 ---
-version: 1.2.5
+version: 1.3.1
 title: Collections
 ---
 
@@ -40,7 +40,11 @@ iex> [1, 2] ++ [3, 4, 1]
 [1, 2, 3, 4, 1]
 ```
 
-A side note about the name (`++/2`) format used above: In Elixir (and Erlang, upon which Elixir is built), a function or operator name has two components: the name you give it (here `++`) and its _arity_. Arity is a core part of speaking about Elixir (and Erlang) code. It is the number of arguments a given function takes (two, in this case). Arity and the given name are combined with a slash. We'll talk more about this later; this knowledge will help you understand the notation for now.
+A side note about the name (`++/2`) format used above:
+In Elixir (and Erlang, upon which Elixir is built), a function or operator name has two components: the name you give it (here `++`) and its _arity_.
+Arity is a core part of speaking about Elixir (and Erlang) code.
+It is the number of arguments a given function takes (two, in this case).
+Arity and the given name are combined with a slash. We'll talk more about this later; this knowledge will help you understand the notation for now.
 
 ### List Subtraction
 
@@ -51,7 +55,8 @@ iex> ["foo", :bar, 42] -- [42, "bar"]
 ["foo", :bar]
 ```
 
-Be mindful of duplicate values. For every element on the right, the first occurrence of it gets removed from the left:
+Be mindful of duplicate values.
+For every element on the right, the first occurrence of it gets removed from the left:
 
 ```elixir
 iex> [1,2,2,3,2,3] -- [1,2,3,2]
@@ -59,6 +64,7 @@ iex> [1,2,2,3,2,3] -- [1,2,3,2]
 ```
 
 **Note:** List subtraction uses [strict comparison](../basics/#comparison) to match the values. For example:
+
 ```elixir
 iex> [2] -- [2.0]
 [2]
@@ -93,7 +99,8 @@ iex> tail
 ## Tuples
 
 Tuples are similar to lists, but are stored contiguously in memory.
-This makes accessing their length fast but modification expensive; the new tuple must be copied entirely to memory. Tuples are defined with curly braces:
+This makes accessing their length fast but modification expensive; the new tuple must be copied entirely to memory.
+Tuples are defined with curly braces:
 
 ```elixir
 iex> {3.14, :pie, "Apple"}
@@ -132,7 +139,8 @@ For these reasons, keyword lists are most commonly used to pass options to funct
 ## Maps
 
 In Elixir, maps are the "go-to" key-value store.
-Unlike keyword lists, they allow keys of any type and are un-ordered. You can define a map with the `%{}` syntax:
+Unlike keyword lists, they allow keys of any type and are un-ordered.
+You can define a map with the `%{}` syntax:
 
 ```elixir
 iex> map = %{:foo => "bar", "hello" => :world}
@@ -177,11 +185,27 @@ iex> map.hello
 "world"
 ```
 
-Another interesting property of maps is that they provide their own syntax for updates:
+Another interesting property of maps is that they provide their own syntax for updates (note: this creates a new map):
 
 ```elixir
 iex> map = %{foo: "bar", hello: "world"}
 %{foo: "bar", hello: "world"}
 iex> %{map | foo: "baz"}
+%{foo: "baz", hello: "world"}
+```
+
+**Note**: this syntax only works for updating a key that already exists in the map! If the key does not exist, a `KeyError` will be raised.
+
+To create a new key, instead use [`Map.put/3`](https://hexdocs.pm/elixir/Map.html#put/3)
+
+```elixir
+iex> map = %{hello: "world"}
+%{hello: "world"}
+iex> %{map | foo: "baz"}
+** (KeyError) key :foo not found in: %{hello: "world"}
+    (stdlib) :maps.update(:foo, "baz", %{hello: "world"})
+    (stdlib) erl_eval.erl:259: anonymous fn/2 in :erl_eval.expr/5
+    (stdlib) lists.erl:1263: :lists.foldl/3
+iex> Map.put(map, :foo, "baz")
 %{foo: "baz", hello: "world"}
 ```

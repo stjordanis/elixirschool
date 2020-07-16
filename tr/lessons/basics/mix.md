@@ -24,8 +24,6 @@ $ mix new example
 * creating .gitignore
 * creating .formatter.exs
 * creating mix.exs
-* creating config
-* creating config/config.exs
 * creating lib
 * creating lib/example.ex
 * creating test
@@ -71,6 +69,7 @@ Bakacağımız ilk bölüm `project`. Burada uygulamamızın adını (`app`), s�
 Uygulamamızı bazen `iex`'de kullanmamız gerekebilir.  Neyse ki Mix bunu kolaylaştırıyor.  Yeni bir  `iex` oturumu başlatabiliriz:
 
 ```bash
+$ cd example
 $ iex -S mix
 ```
 

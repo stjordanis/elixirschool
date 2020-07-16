@@ -1,5 +1,5 @@
 ---
-version: 1.0.2
+version: 1.1.0
 title: GenStage
 ---
 
@@ -57,7 +57,7 @@ $ cd genstage_example
 ```elixir
 defp deps do
   [
-    {:gen_stage, "~> 0.11"},
+    {:gen_stage, "~> 1.0.0"},
   ]
 end
 ```
@@ -118,7 +118,7 @@ defmodule GenstageExample.ProducerConsumer do
 
   require Integer
 
-  def start_link do
+  def start_link(_initial) do
     GenStage.start_link(__MODULE__, :state_doesnt_matter, name: __MODULE__)
   end
 
@@ -154,7 +154,7 @@ $ touch lib/genstage_example/consumer.ex
 defmodule GenstageExample.Consumer do
   use GenStage
 
-  def start_link do
+  def start_link(_initial) do
     GenStage.start_link(__MODULE__, :state_doesnt_matter)
   end
 
@@ -186,9 +186,9 @@ def start(_type, _args) do
   import Supervisor.Spec, warn: false
 
   children = [
-    worker(GenstageExample.Producer, [0]),
-    worker(GenstageExample.ProducerConsumer, []),
-    worker(GenstageExample.Consumer, [])
+    {GenstageExample.Producer, 0},
+    {GenstageExample.ProducerConsumer, []},
+    {GenstageExample.Consumer, []}
   ]
 
   opts = [strategy: :one_for_one, name: GenstageExample.Supervisor]
@@ -221,10 +221,16 @@ $ mix run --no-halt
 
 ```elixir
 children = [
-  worker(GenstageExample.Producer, [0]),
-  worker(GenstageExample.ProducerConsumer, []),
-  worker(GenstageExample.Consumer, [], id: 1),
-  worker(GenstageExample.Consumer, [], id: 2)
+  {GenstageExample.Producer, 0},
+  {GenstageExample.ProducerConsumer, []},
+  %{
+    id: 1,
+    start: {GenstageExample.Consumer, :start_link, [[]]}
+  },
+  %{
+    id: 2,
+    start: {GenstageExample.Consumer, :start_link, [[]]}
+  }
 ]
 ```
 
@@ -251,7 +257,7 @@ $ mix run --no-halt
 
 + 数据转换管道 — 生产者不必是简单的数字生成器. 我们可以从数据库甚至其他来源(如 Apache's Kafka)生成事件.  再加上生产者-消费者和消费者, 我们可以在它们可用的时候做处理, 排序, 分类以及指标存储.
 
-+ 工作队列 — 因为事件可以是任何东西, 所以我们可以生产由一系列消费者来处理的单位工作.
++ 工作队列 — 因为事件可以是任何东西, 所以我们可以生产一系列由消费者完成的工作单元.
 
 + 事件处理 — 类似于数据管道, 我们可以对源产生的实时事件进行接收, 处理, 排序, 以及做出行动.
 

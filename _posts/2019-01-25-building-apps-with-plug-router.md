@@ -1,7 +1,7 @@
 ---
 author: Sean Callan
 categories: general
-tags: ['plug']
+tags: ['plug', 'software design']
 date: 2019-01-25
 layout: post
 title: Building web apps with Plug.Router
@@ -38,8 +38,6 @@ $ mix new router_example --sup
 * creating .formatter.exs
 * creating .gitignore
 * creating mix.exs
-* creating config
-* creating config/config.exs
 * creating lib
 * creating lib/router_example.ex
 * creating lib/router_example/application.ex
@@ -74,14 +72,13 @@ The `plug_cowboy` package makes this step easy with the included `Plug.Cowboy.ch
 Let's update our application's `start/2` function:
 
 ```elixir
-  def start(_type, _args) do
-    children = [
-      Plug.Cowboy.child_spec(scheme: :http, plug: RouterExample.Router, options: [port: 4001])
-    ]
+def start(_type, _args) do
+  children = [
+    Plug.Cowboy.child_spec(scheme: :http, plug: RouterExample.Router, options: [port: 4001])
+  ]
 
-    opts = [strategy: :one_for_one, name: RouterExample.Supervisor]
-    Supervisor.start_link(children, opts)
-  end
+  opts = [strategy: :one_for_one, name: RouterExample.Supervisor]
+  Supervisor.start_link(children, opts)
 end
 ```
 
@@ -185,7 +182,7 @@ Next we'll create two templates `index.html.eex` and `contact.html.eex`.
 
 You can find the code for `index.html.eex` [here](https://raw.githubusercontent.com/elixirschool/router_example/master/lib/router_example/templates/index.html.eex) and `contact.html.eex` [here](https://raw.githubusercontent.com/elixirschool/router_example/master/lib/router_example/templates/contact.html.eex), we won't focus on HTML or CSS today.
 
-### Sending and recieving JSON
+### Sending and receiving JSON
 
 Building JSON endpoints in Plug.Router is much less work than the template rendering we just covered.
 

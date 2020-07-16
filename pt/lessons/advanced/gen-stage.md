@@ -1,5 +1,5 @@
 ---
-version: 1.0.2
+version: 1.1.0
 title: GenStage
 ---
 
@@ -23,7 +23,7 @@ Neste exemplo temos três etapas: `A` um produtor, `B` um produtor-consumidor, e
 
 Enquanto nosso exemplo é 1-para-1, produtor-para-consumidor, é possível que ambos tenham múltiplos produtores e múltiplos consumidores em qualquer etapa.
 
-Para ilustrar melhor esses conceitos, vamos construtir um pipeline com GenStage, mas antes vamos explorar os papéis que o GenStage depende um pouco mais.
+Para ilustrar melhor esses conceitos, vamos construir um pipeline com GenStage, mas antes vamos explorar os papéis que o GenStage depende um pouco mais.
 
 ## Consumidores e Produtores
 
@@ -57,7 +57,7 @@ Vamos atualizar nossas dependências no `mix.exs` para incluir `gen_stage`:
 ```elixir
 defp deps do
   [
-    {:gen_stage, "~> 0.11"}
+    {:gen_stage, "~> 1.0.0"}
   ]
 end
 ```
@@ -118,7 +118,7 @@ defmodule GenstageExample.ProducerConsumer do
 
   require Integer
 
-  def start_link do
+  def start_link(_initial) do
     GenStage.start_link(__MODULE__, :state_doesnt_matter, name: __MODULE__)
   end
 
@@ -138,7 +138,7 @@ end
 
 Você deve ter notado com nosso produtor-consumidor que introduzimos uma nova opção no `init/1` e uma nova função: `handle_events/3`. Com a opção `subscribe_to`, instruímos o GenStage a nos colocar em comunicação com um produtor específico.
 
-A função `handle_events/3` é nosso cavalo de batalha, onde recebemos nossos eventos de entrada, os processamos, e retornamos nosso conjunto modificado. Como veremos, consumidores são implementados de de maneira muito semelhante, mas a diferença importante é que nossa função `handle_events/3` retorna e como ela é usada. Quando rotulamos nosso processo um produtor_consumidor, o segundo argumento da nossa tupla — `numbers` no nosso caso — é usado para conhecer a demanda de consumidores. Em consumidores esse valor é descartado.
+A função `handle_events/3` é nosso cavalo de batalha, onde recebemos nossos eventos de entrada, os processamos, e retornamos nosso conjunto modificado. Como veremos, consumidores são implementados de maneira muito semelhante, mas a diferença importante é que nossa função `handle_events/3` retorna e como ela é usada. Quando rotulamos nosso processo um produtor_consumidor, o segundo argumento da nossa tupla — `numbers` no nosso caso — é usado para conhecer a demanda de consumidores. Em consumidores esse valor é descartado.
 
 ## Consumidor
 
@@ -154,7 +154,7 @@ Uma vez que consumidores e produtores-consumidores são tão similares, nosso c�
 defmodule GenstageExample.Consumer do
   use GenStage
 
-  def start_link do
+  def start_link(_initial) do
     GenStage.start_link(__MODULE__, :state_doesnt_matter)
   end
 
@@ -186,9 +186,9 @@ def start(_type, _args) do
   import Supervisor.Spec, warn: false
 
   children = [
-    worker(GenstageExample.Producer, [0]),
-    worker(GenstageExample.ProducerConsumer, []),
-    worker(GenstageExample.Consumer, [])
+    {GenstageExample.Producer, 0},
+    {GenstageExample.ProducerConsumer, []},
+    {GenstageExample.Consumer, []}
   ]
 
   opts = [strategy: :one_for_one, name: GenstageExample.Supervisor]
@@ -217,14 +217,20 @@ Neste ponto temos um pipeline funcionando. Existe um produtor emitindo números,
 
 Mencionamos na introdução que era possível ter mais que um produtor ou consumidor. Vamos dar uma olhada nisso.
 
-Se examinarmos a saída do `IO.inspect/1` do nosso exemplo, vemos que todo evento é tratatdo por um único PID. Vamos fazer alguns ajustes para múltiplos _workers_ modificando o `lib/genstage_example/application.ex`:
+Se examinarmos a saída do `IO.inspect/1` do nosso exemplo, vemos que todo evento é tratado por um único PID. Vamos fazer alguns ajustes para múltiplos _workers_ modificando o `lib/genstage_example/application.ex`:
 
 ```elixir
 children = [
-  worker(GenstageExample.Producer, [0]),
-  worker(GenstageExample.ProducerConsumer, []),
-  worker(GenstageExample.Consumer, [], id: 1),
-  worker(GenstageExample.Consumer, [], id: 2)
+  {GenstageExample.Producer, 0},
+  {GenstageExample.ProducerConsumer, []},
+  %{
+    id: 1,
+    start: {GenstageExample.Consumer, :start_link, [[]]}
+  },
+  %{
+    id: 2,
+    start: {GenstageExample.Consumer, :start_link, [[]]}
+  },
 ]
 ```
 
